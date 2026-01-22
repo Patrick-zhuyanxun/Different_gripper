@@ -1,0 +1,549 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Three-Finger Soft Gripper Macro -->
+  <!-- Converted from robot.urdf with mimic joints for synchronized finger control -->
+  <!-- Only dof_finger_A (slide) is controllable; revolute joints mimic it via kinematic coupling -->
+  
+  <!-- 
+    Mimic Joint Calculation:
+    Based on crank-slider mechanism kinematic coupling data:
+    - slide range: 0 to 0.01344 m (approximately 0.013 m)
+    - At slide=0m:     joint_*_1 = -1.071° = -0.0187 rad,  joint_*_2 = 351.098° = 6.127 rad (or -8.902°)
+    - At slide=0.013m: joint_*_1 = 0.402° = 0.00702 rad, joint_*_2 = 328.442° = 5.732 rad (or -31.558°)
+    
+    For joint_*_1: multiplier = (0.402 - (-1.071)) / 0.013 * π/180 = 1.978 rad/m ≈ 2.0
+                   offset = -1.071° = -0.0187 rad
+    
+    For joint_*_2: multiplier = (328.442 - 351.098) / 0.013 * π/180 = -30.4 rad/m ≈ -30.0
+                   offset = 351.098° - 360° = -8.902° = -0.155 rad (normalized)
+  -->
+
+  <xacro:macro name="three_finger_soft_gripper" params="parent prefix">
+  
+    <!-- Attach gripper to parent flange -->
+    <joint name="${prefix}gripper_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}d435_mount"/>
+    </joint>
+
+    <!-- ====================== -->
+    <!-- Link: d435_mount (Base) -->
+    <!-- ====================== -->
+    <link name="${prefix}d435_mount">
+      <inertial>
+        <origin xyz="0.00378217 0.000154165 0.0635909" rpy="0 0 0"/>
+        <mass value="0.105692"/>
+        <inertia ixx="7.48223e-05" ixy="-3.1735e-07" ixz="5.26878e-07" iyy="7.47453e-05" iyz="-4.37367e-07" izz="3.93423e-05"/>
+      </inertial>
+      <!-- Part 42_step_motor -->
+      <visual>
+        <origin xyz="0.0633248 -0.0560504 0.051284" rpy="-1.5708 0 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_step_motor.stl"/>
+        </geometry>
+        <material name="${prefix}42_step_motor_material">
+          <color rgba="0.501961 0.501961 0.501961 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0633248 -0.0560504 0.051284" rpy="-1.5708 0 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_step_motor.stl"/>
+        </geometry>
+      </collision>
+      <!-- Part fa3_main_body -->
+      <visual>
+        <origin xyz="0.0633248 -0.0560504 0.050684" rpy="-1.5708 0 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_main_body.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_main_body_material">
+          <color rgba="0.372549 0.372549 0.372549 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0633248 -0.0560504 0.050684" rpy="-1.5708 0 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_main_body.stl"/>
+        </geometry>
+      </collision>
+      <!-- Part d435_mount -->
+      <visual>
+        <origin xyz="0.004 0 0" rpy="1.5708 0 -1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/d435_mount.stl"/>
+        </geometry>
+        <material name="${prefix}d435_mount_material">
+          <color rgba="0.615686 0.811765 0.929412 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.004 0 0" rpy="1.5708 0 -1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/d435_mount.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- ====================== -->
+    <!-- MTC Dummy Links (Fixed Frames) -->
+    <!-- ====================== -->
+    
+    <!-- closing_joint_1_3_1 -->
+    <link name="${prefix}closing_joint_1_3_1">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_1_3_1_frame" type="fixed">
+      <origin xyz="-0.0156 0.0197 0.096" rpy="-0.927293 1.5708 0"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}closing_joint_1_3_1"/>
+    </joint>
+
+    <!-- closing_joint_1_3_1_z -->
+    <link name="${prefix}closing_joint_1_3_1_z">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_1_3_1_z_frame" type="fixed">
+      <origin xyz="0.0444001 0.0996999 0.096" rpy="-0.927293 1.5708 0"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}closing_joint_1_3_1_z"/>
+    </joint>
+
+    <!-- closing_joint_2_3_2 -->
+    <link name="${prefix}closing_joint_2_3_2">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_2_3_2_frame" type="fixed">
+      <origin xyz="-0.00326079 -0.0268241 0.096" rpy="1.5708 0 1.45089"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}closing_joint_2_3_2"/>
+    </joint>
+
+    <!-- closing_joint_2_3_2_z -->
+    <link name="${prefix}closing_joint_2_3_2_z">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_2_3_2_z_frame" type="fixed">
+      <origin xyz="0.0960212 -0.0387858 0.096" rpy="1.5708 0 1.45089"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}closing_joint_2_3_2_z"/>
+    </joint>
+
+    <!-- closing_joint_3_3_1 -->
+    <link name="${prefix}closing_joint_3_3_1">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_3_3_1_frame" type="fixed">
+      <origin xyz="0.0308607 0.00712404 0.096" rpy="1.5708 0 0.403695"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}closing_joint_3_3_1"/>
+    </joint>
+
+    <!-- closing_joint_3_3_1_z -->
+    <link name="${prefix}closing_joint_3_3_1_z">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_3_3_1_z_frame" type="fixed">
+      <origin xyz="0.0701425 -0.0848376 0.096" rpy="1.5708 0 0.403695"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}closing_joint_3_3_1_z"/>
+    </joint>
+
+    <!-- eef (end effector frame) -->
+    <link name="${prefix}eef">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}eef_frame" type="fixed">
+      <origin xyz="0.00399996 0 0.201" rpy="0 0 0.927293"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}eef"/>
+    </joint>
+
+    <!-- ====================== -->
+    <!-- Link: 42_motor_nut (Drive Board) -->
+    <!-- ====================== -->
+    <link name="${prefix}42_motor_nut">
+      <inertial>
+        <origin xyz="0 0 -0.0013495" rpy="0 0 0"/>
+        <mass value="0.0110913"/>
+        <inertia ixx="5.82726e-06" ixy="0" ixz="0" iyy="5.82726e-06" iyz="0" izz="1.14227e-05"/>
+      </inertial>
+      <!-- Part fa3_driveboard -->
+      <visual>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 0 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_driveboard_material">
+          <color rgba="0.309804 0.309804 0.309804 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 0 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+      </collision>
+      <!-- Part 42_motor_nut -->
+      <visual>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 0 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+        <material name="${prefix}42_motor_nut_material">
+          <color rgba="1 0.952941 0.380392 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 0 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- ====================== -->
+    <!-- MAIN CONTROLLABLE JOINT: dof_finger_A (slide) -->
+    <!-- This is the only joint controlled by MoveIt -->
+    <!-- ====================== -->
+    <joint name="${prefix}dof_finger_A" type="prismatic">
+      <origin xyz="0.00399996 0 0.02906" rpy="0 0 0.927293"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}42_motor_nut"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="0" upper="0.01344"/>
+    </joint>
+
+    <!-- ====================== -->
+    <!-- Finger 1 Links and Joints -->
+    <!-- ====================== -->
+    
+    <!-- Link: fa3_link_2 -->
+    <link name="${prefix}fa3_link_2">
+      <inertial>
+        <origin xyz="-0.0269889 -0.000772768 -0.004" rpy="0 0 0"/>
+        <mass value="0.002697"/>
+        <inertia ixx="2.26269e-08" ixy="-2.53446e-08" ixz="0" iyy="9.0706e-07" iyz="0" izz="9.00919e-07"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.0147666 0.12609 0.00524528" rpy="1.5708 1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_2.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_link_2_material">
+          <color rgba="0.603922 0.603922 0.603922 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0147666 0.12609 0.00524528" rpy="1.5708 1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_2.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint: joint_1_1 (mimic dof_finger_A) -->
+    <joint name="${prefix}joint_1_1" type="revolute">
+      <origin xyz="-0.004 0.045 0.0043" rpy="-1.5708 1.5521 1.5708"/>
+      <parent link="${prefix}42_motor_nut"/>
+      <child link="${prefix}fa3_link_2"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+      <mimic joint="${prefix}dof_finger_A" multiplier="1.978" offset="-0.0187"/>
+    </joint>
+
+    <!-- Link: famr20100_soft_2 -->
+    <link name="${prefix}famr20100_soft_2">
+      <inertial>
+        <origin xyz="-0.0330057 0.00845313 0.004" rpy="0 0 0"/>
+        <mass value="0.0327922"/>
+        <inertia ixx="8.12003e-06" ixy="8.85505e-06" ixz="0" iyy="2.77939e-05" iyz="0" izz="3.32867e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="0.0189884 -0.132166 -0.00524528" rpy="-1.72616 -1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_2.stl"/>
+        </geometry>
+        <material name="${prefix}famr20100_soft_2_material">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0189884 -0.132166 -0.00524528" rpy="-1.72616 -1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_2.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint: joint_1_2 (mimic dof_finger_A) -->
+    <joint name="${prefix}joint_1_2" type="revolute">
+      <origin xyz="-0.0539779 -0.00154554 0" rpy="3.14159 0 0"/>
+      <parent link="${prefix}fa3_link_2"/>
+      <child link="${prefix}famr20100_soft_2"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+      <mimic joint="${prefix}dof_finger_A" multiplier="-30.4" offset="-0.155"/>
+    </joint>
+
+    <!-- closing_joint_1_3_2 (on famr20100_soft_2) -->
+    <link name="${prefix}closing_joint_1_3_2">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_1_3_2_frame" type="fixed">
+      <origin xyz="-0.00897832 -0.0178715 0.008" rpy="0 0 -0.155366"/>
+      <parent link="${prefix}famr20100_soft_2"/>
+      <child link="${prefix}closing_joint_1_3_2"/>
+    </joint>
+
+    <!-- closing_joint_1_3_2_z -->
+    <link name="${prefix}closing_joint_1_3_2_z">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_1_3_2_z_frame" type="fixed">
+      <origin xyz="-0.00897832 -0.0178715 0.108" rpy="0 0 -0.155366"/>
+      <parent link="${prefix}famr20100_soft_2"/>
+      <child link="${prefix}closing_joint_1_3_2_z"/>
+    </joint>
+
+    <!-- ====================== -->
+    <!-- Finger 2 Links and Joints -->
+    <!-- ====================== -->
+
+    <!-- Link: fa3_link -->
+    <link name="${prefix}fa3_link">
+      <inertial>
+        <origin xyz="-0.000772768 0.0269889 -0.004" rpy="0 0 0"/>
+        <mass value="0.002697"/>
+        <inertia ixx="9.0706e-07" ixy="2.53446e-08" ixz="0" iyy="2.26269e-08" iyz="0" izz="9.00919e-07"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.00355171 0.0147666 0.0616035" rpy="3.14159 -0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_link_material">
+          <color rgba="0.603922 0.603922 0.603922 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00355171 0.0147666 0.0616035" rpy="3.14159 -0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint: joint_2_1 (mimic dof_finger_A) -->
+    <joint name="${prefix}joint_2_1" type="revolute">
+      <origin xyz="-0.0369711 -0.0259641 0.0043" rpy="1.5708 0.0186952 0.523599"/>
+      <parent link="${prefix}42_motor_nut"/>
+      <child link="${prefix}fa3_link"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+      <mimic joint="${prefix}dof_finger_A" multiplier="1.978" offset="-0.0187"/>
+    </joint>
+
+    <!-- Link: famr20100_soft_1 -->
+    <link name="${prefix}famr20100_soft_1">
+      <inertial>
+        <origin xyz="-0.00324394 -0.0339162 0.004" rpy="0 0 0"/>
+        <mass value="0.0327922"/>
+        <inertia ixx="3.00303e-05" ixy="-5.42327e-06" ixz="0" iyy="5.88364e-06" iyz="0" izz="3.32867e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.00200617 0.0392113 -0.0616035" rpy="0 0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_1.stl"/>
+        </geometry>
+        <material name="${prefix}famr20100_soft_1_material">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00200617 0.0392113 -0.0616035" rpy="0 0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint: joint_2_2 (mimic dof_finger_A) -->
+    <joint name="${prefix}joint_2_2" type="revolute">
+      <origin xyz="-0.00154554 0.0539779 0" rpy="3.14159 0 0.155366"/>
+      <parent link="${prefix}fa3_link"/>
+      <child link="${prefix}famr20100_soft_1"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+      <mimic joint="${prefix}dof_finger_A" multiplier="-30.4" offset="-0.155"/>
+    </joint>
+
+    <!-- closing_joint_2_3_1 (on famr20100_soft_1) -->
+    <link name="${prefix}closing_joint_2_3_1">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_2_3_1_frame" type="fixed">
+      <origin xyz="0.0190455 -0.00610471 0.008" rpy="3.14159 0 0"/>
+      <parent link="${prefix}famr20100_soft_1"/>
+      <child link="${prefix}closing_joint_2_3_1"/>
+    </joint>
+
+    <!-- closing_joint_2_3_1_z -->
+    <link name="${prefix}closing_joint_2_3_1_z">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_2_3_1_z_frame" type="fixed">
+      <origin xyz="0.0190455 -0.00610471 -0.092" rpy="3.14159 0 0"/>
+      <parent link="${prefix}famr20100_soft_1"/>
+      <child link="${prefix}closing_joint_2_3_1_z"/>
+    </joint>
+
+    <!-- ====================== -->
+    <!-- Finger 3 Links and Joints -->
+    <!-- ====================== -->
+
+    <!-- Link: fa3_link_1 -->
+    <link name="${prefix}fa3_link_1">
+      <inertial>
+        <origin xyz="0.000772768 -0.0269889 -0.004" rpy="0 0 0"/>
+        <mass value="0.002697"/>
+        <inertia ixx="9.0706e-07" ixy="2.53446e-08" ixz="0" iyy="2.26269e-08" iyz="0" izz="9.00919e-07"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.0124616 -0.0147666 -0.0788487" rpy="0 -0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_1.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_link_1_material">
+          <color rgba="0.603922 0.603922 0.603922 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0124616 -0.0147666 -0.0788487" rpy="0 -0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint: joint_3_1 (mimic dof_finger_A) -->
+    <joint name="${prefix}joint_3_1" type="revolute">
+      <origin xyz="0.0409711 -0.0190359 0.0043" rpy="-1.5708 -0.0186952 -0.523599"/>
+      <parent link="${prefix}42_motor_nut"/>
+      <child link="${prefix}fa3_link_1"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+      <mimic joint="${prefix}dof_finger_A" multiplier="1.978" offset="-0.0187"/>
+    </joint>
+
+    <!-- Link: famr20100_soft -->
+    <link name="${prefix}famr20100_soft">
+      <inertial>
+        <origin xyz="0.00845313 -0.0330057 0.004" rpy="0 0 0"/>
+        <mass value="0.0327922"/>
+        <inertia ixx="2.77939e-05" ixy="8.85504e-06" ixz="0" iyy="8.12003e-06" iyz="0" izz="3.32867e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.019906 0.0365715 -0.0708487" rpy="0 -0.523599 0.155366"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft.stl"/>
+        </geometry>
+        <material name="${prefix}famr20100_soft_material">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.019906 0.0365715 -0.0708487" rpy="0 -0.523599 0.155366"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint: joint_3_2 (mimic dof_finger_A) -->
+    <joint name="${prefix}joint_3_2" type="revolute">
+      <origin xyz="0.00154554 -0.0539779 -0.008" rpy="0 0 0"/>
+      <parent link="${prefix}fa3_link_1"/>
+      <child link="${prefix}famr20100_soft"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+      <mimic joint="${prefix}dof_finger_A" multiplier="-30.4" offset="-0.155"/>
+    </joint>
+
+    <!-- closing_joint_3_3_2 (on famr20100_soft) -->
+    <link name="${prefix}closing_joint_3_3_2">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_3_3_2_frame" type="fixed">
+      <origin xyz="-0.0178715 -0.00897832 0" rpy="-3.14159 0 0.155366"/>
+      <parent link="${prefix}famr20100_soft"/>
+      <child link="${prefix}closing_joint_3_3_2"/>
+    </joint>
+
+    <!-- closing_joint_3_3_2_z -->
+    <link name="${prefix}closing_joint_3_3_2_z">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}closing_joint_3_3_2_z_frame" type="fixed">
+      <origin xyz="-0.0178715 -0.00897832 -0.1" rpy="-3.14159 0 0.155366"/>
+      <parent link="${prefix}famr20100_soft"/>
+      <child link="${prefix}closing_joint_3_3_2_z"/>
+    </joint>
+
+  </xacro:macro>
+
+</robot>

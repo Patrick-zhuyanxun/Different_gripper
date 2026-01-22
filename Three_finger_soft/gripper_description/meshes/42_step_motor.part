@@ -1,0 +1,13 @@
+{
+    "configuration": "default",
+    "documentId": "77ae2a3fa2dfa0e3fa6e957b",
+    "documentMicroversion": "b6e8091b5a5a5df7ea1b5464",
+    "elementId": "eb68cf987d7342244dc6a099",
+    "fullConfiguration": "default",
+    "id": "M1j0r12cVd1iBz6CB",
+    "isStandardContent": false,
+    "name": "42_step_motor <1>",
+    "partId": "JFj",
+    "suppressed": false,
+    "type": "Part"
+}

@@ -1,0 +1,439 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gripper">
+  <xacro:macro name="gripper" params="parent prefix">
+    <joint name="${prefix}gripper_base_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}d435_mount"/>
+    </joint>
+
+    <link name="${prefix}d435_mount">
+      <inertial>
+        <origin xyz="0.00378217 0.000154165 0.0635909" rpy="0 0 0"/>
+        <mass value="0.105692"/>
+        <inertia ixx="7.48223e-05" ixy="-3.1735e-07" ixz="5.26878e-07" iyy="7.47453e-05" iyz="-4.37367e-07" izz="3.93423e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="0.0633248 -0.0560504 0.051284" rpy="-1.5708 1.07553e-16 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_step_motor.stl"/>
+        </geometry>
+        <material name="${prefix}42_step_motor_material">
+          <color rgba="0.501961 0.501961 0.501961 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0633248 -0.0560504 0.051284" rpy="-1.5708 1.07553e-16 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_step_motor.stl"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0.0633248 -0.0560504 0.050684" rpy="-1.5708 1.07553e-16 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_main_body.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_main_body_material">
+          <color rgba="0.372549 0.372549 0.372549 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0633248 -0.0560504 0.050684" rpy="-1.5708 1.07553e-16 0.927293"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_main_body.stl"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0.004 -2.44929e-19 0" rpy="1.5708 -0 -1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/d435_mount.stl"/>
+        </geometry>
+        <material name="${prefix}d435_mount_material">
+          <color rgba="0.615686 0.811765 0.929412 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.004 -2.44929e-19 0" rpy="1.5708 -0 -1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/d435_mount.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="${prefix}eef">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-9"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}eef_frame" type="fixed">
+      <origin xyz="0.00399996 -1.25049e-08 0.201" rpy="1.45717e-16 1.07553e-16 0.927293"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}eef"/>
+      <axis xyz="0 0 0"/>
+    </joint>
+
+    <link name="${prefix}42_motor_nut">
+      <inertial>
+        <origin xyz="-4.09809e-15 -9.55014e-16 -0.0013495" rpy="0 0 0"/>
+        <mass value="0.0110913"/>
+        <inertia ixx="5.82726e-06" ixy="-7.68878e-33" ixz="1.85499e-20" iyy="5.82726e-06" iyz="4.8861e-21" izz="1.14227e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 -4.90029e-16 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_driveboard_material">
+          <color rgba="0.309804 0.309804 0.309804 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 -4.90029e-16 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 -0 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+        <material name="${prefix}42_motor_nut_material">
+          <color rgba="1 0.952941 0.380392 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00924528 -0.0810901 0.0190666" rpy="-1.5708 -0 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}slide" type="prismatic">
+      <origin xyz="0.00399996 -1.25049e-08 0.02906" rpy="9.4369e-16 9.35345e-17 0.927293"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}42_motor_nut"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-5.20417e-18" upper="0.01344"/>
+    </joint>
+
+    <link name="${prefix}famr20100_soft_2">
+      <inertial>
+        <origin xyz="-0.0245153 -0.0258708 0.004" rpy="0 0 0"/>
+        <mass value="0.0327922"/>
+        <inertia ixx="7.79589e-06" ixy="-8.48113e-06" ixz="8.98551e-15" iyy="2.81181e-05" iyz="6.64115e-15" izz="3.32867e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="0.0300985 0.113752 0.0132453" rpy="1.43413 1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_2.stl"/>
+        </geometry>
+        <material name="${prefix}famr20100_soft_2_material">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0300985 0.113752 0.0132453" rpy="1.43413 1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_2.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_1_3" type="revolute">
+      <origin xyz="-0.0156 0.0197 0.096" rpy="2.2143 1.5708 0"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}famr20100_soft_2"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}fa3_link_2">
+      <inertial>
+        <origin xyz="0.0269889 0.000772768 -0.004" rpy="0 0 0"/>
+        <mass value="0.002697"/>
+        <inertia ixx="2.26269e-08" ixy="-2.53446e-08" ixz="-1.40691e-24" iyy="9.0706e-07" iyz="3.40899e-25" izz="9.00919e-07"/>
+      </inertial>
+      <visual>
+        <origin xyz="0.0392113 0.127636 0.00524528" rpy="1.5708 1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_2.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_link_2_material">
+          <color rgba="0.603922 0.603922 0.603922 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0392113 0.127636 0.00524528" rpy="1.5708 1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_2.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_1_2" type="revolute">
+      <origin xyz="0.00864266 -0.0180362 0.008" rpy="-5.88418e-15 -1.69309e-15 -0.0186952"/>
+      <parent link="${prefix}famr20100_soft_2"/>
+      <child link="${prefix}fa3_link_2"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}42_motor_nut_2">
+      <inertial>
+        <origin xyz="0.00480728 -0.0450977 0.004" rpy="0 0 0"/>
+        <mass value="0.0110913"/>
+        <inertia ixx="1.14207e-05" ixy="-1.04583e-07" ixz="-1.4047e-20" iyy="5.82921e-06" iyz="-1.58977e-20" izz="5.82726e-06"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.0171211 -0.125792 -0.00524528" rpy="-1.58949 -1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_driveboard_2_material">
+          <color rgba="0.309804 0.309804 0.309804 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0171211 -0.125792 -0.00524528" rpy="-1.58949 -1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="-0.0171211 -0.125792 -0.00524528" rpy="-1.58949 -1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+        <material name="${prefix}42_motor_nut_2_material">
+          <color rgba="1 0.952941 0.380392 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0171211 -0.125792 -0.00524528" rpy="-1.58949 -1.5708 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_1_1" type="revolute">
+      <origin xyz="0.0539779 0.00154554 0" rpy="-3.14159 -0 3.46945e-18"/>
+      <parent link="${prefix}fa3_link_2"/>
+      <child link="${prefix}42_motor_nut_2"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}famr20100_soft_1">
+      <inertial>
+        <origin xyz="-0.0222895 0.0278115 0.004" rpy="0 0 0"/>
+        <mass value="0.0327922"/>
+        <inertia ixx="3.00303e-05" ixy="5.42327e-06" ixz="1.35211e-13" iyy="5.88364e-06" iyz="-4.5334e-13" izz="3.32867e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.0210517 -0.045316 0.0696035" rpy="-3.14159 -0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_1.stl"/>
+        </geometry>
+        <material name="${prefix}famr20100_soft_1_material">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0210517 -0.045316 0.0696035" rpy="-3.14159 -0.523599 0"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft_1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_2_3" type="revolute">
+      <origin xyz="-0.00326079 -0.0268241 0.096" rpy="1.5708 -0.136671 1.45089"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}famr20100_soft_1"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}fa3_link">
+      <inertial>
+        <origin xyz="0.0269889 0.000772768 -0.004" rpy="0 0 0"/>
+        <mass value="0.002697"/>
+        <inertia ixx="2.26269e-08" ixy="-2.53446e-08" ixz="-2.47948e-23" iyy="9.0706e-07" iyz="1.1577e-23" izz="9.00919e-07"/>
+      </inertial>
+      <visual>
+        <origin xyz="0.0392113 -0.00200617 0.0616035" rpy="3.14159 -0.523599 1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_link_material">
+          <color rgba="0.603922 0.603922 0.603922 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0392113 -0.00200617 0.0616035" rpy="3.14159 -0.523599 1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_1_3" type="revolute">
+      <origin xyz="-0.0190455 -0.00610471 0.008" rpy="-6.10623e-15 -3.9465e-16 -1.72616"/>
+      <parent link="${prefix}famr20100_soft_1"/>
+      <child link="${prefix}fa3_link"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}42_motor_nut_3">
+      <inertial>
+        <origin xyz="0.0450977 0.00480728 0.004" rpy="0 0 0"/>
+        <mass value="0.0110913"/>
+        <inertia ixx="5.82921e-06" ixy="1.04583e-07" ixz="-3.76397e-19" iyy="1.14207e-05" iyz="1.59138e-20" izz="5.82726e-06"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.00382713 -0.0146976 -0.0616035" rpy="6.99202e-16 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_driveboard_3_material">
+          <color rgba="0.309804 0.309804 0.309804 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00382713 -0.0146976 -0.0616035" rpy="6.99202e-16 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="-0.00382713 -0.0146976 -0.0616035" rpy="9.8212e-16 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+        <material name="${prefix}42_motor_nut_3_material">
+          <color rgba="1 0.952941 0.380392 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.00382713 -0.0146976 -0.0616035" rpy="9.8212e-16 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_2_1" type="revolute">
+      <origin xyz="0.0539779 0.00154554 -2.1684e-18" rpy="3.14159 -1.38778e-17 1.5708"/>
+      <parent link="${prefix}fa3_link"/>
+      <child link="${prefix}42_motor_nut_3"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}famr20100_soft">
+      <inertial>
+        <origin xyz="0.0258708 -0.0245153 0.004" rpy="0 0 0"/>
+        <mass value="0.0327922"/>
+        <inertia ixx="2.8118e-05" ixy="8.48113e-06" ixz="1.83614e-13" iyy="7.79589e-06" iyz="-4.12638e-13" izz="3.32867e-05"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.0011827 0.0455799 -0.0708487" rpy="-6.73037e-16 -0.523599 0.136671"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft.stl"/>
+        </geometry>
+        <material name="${prefix}famr20100_soft_material">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0011827 0.0455799 -0.0708487" rpy="-6.73037e-16 -0.523599 0.136671"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/famr20100_soft.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_2_2" type="revolute">
+      <origin xyz="0.0308607 0.00712404 0.096" rpy="-1.5708 1.66002e-16 0.403695"/>
+      <parent link="${prefix}d435_mount"/>
+      <child link="${prefix}famr20100_soft"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}fa3_link_1">
+      <inertial>
+        <origin xyz="0.0269889 0.000772768 -0.004" rpy="0 0 0"/>
+        <mass value="0.002697"/>
+        <inertia ixx="2.26269e-08" ixy="-2.53446e-08" ixz="-4.91431e-23" iyy="9.0706e-07" iyz="-3.46703e-23" izz="9.00919e-07"/>
+      </inertial>
+      <visual>
+        <origin xyz="0.0392113 0.0140071 -0.0788487" rpy="5.07782e-16 -0.523599 -1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_1.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_link_1_material">
+          <color rgba="0.603922 0.603922 0.603922 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0392113 0.0140071 -0.0788487" rpy="5.07782e-16 -0.523599 -1.5708"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_link_1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_2_3" type="revolute">
+      <origin xyz="0.0180362 0.00864266 0.008" rpy="9.4369e-15 -9.567e-16 1.5521"/>
+      <parent link="${prefix}famr20100_soft"/>
+      <child link="${prefix}fa3_link_1"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+    <link name="${prefix}42_motor_nut_4">
+      <inertial>
+        <origin xyz="-0.0450977 -0.00480728 0.004" rpy="0 0 0"/>
+        <mass value="0.0110913"/>
+        <inertia ixx="5.82921e-06" ixy="1.04583e-07" ixz="-3.43173e-19" iyy="1.14207e-05" iyz="-2.78735e-20" izz="5.82726e-06"/>
+      </inertial>
+      <visual>
+        <origin xyz="-0.0121834 0.0149969 0.0788487" rpy="3.14159 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+        <material name="${prefix}fa3_driveboard_4_material">
+          <color rgba="0.309804 0.309804 0.309804 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0121834 0.0149969 0.0788487" rpy="3.14159 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/fa3_driveboard.stl"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="-0.0121834 0.0149969 0.0788487" rpy="3.14159 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+        <material name="${prefix}42_motor_nut_4_material">
+          <color rgba="1 0.952941 0.380392 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.0121834 0.0149969 0.0788487" rpy="3.14159 0.523599 -0.0186952"/>
+        <geometry>
+          <mesh filename="package://gripper_description/meshes/42_motor_nut.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint_3_1" type="revolute">
+      <origin xyz="0.0539779 0.00154554 2.08167e-17" rpy="-3.14159 -5.55112e-17 -1.5708"/>
+      <parent link="${prefix}fa3_link_1"/>
+      <child link="${prefix}42_motor_nut_4"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

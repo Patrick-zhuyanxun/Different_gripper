@@ -1,7 +1,0 @@
-{
-    "documentId": "77ae2a3fa2dfa0e3fa6e957b",
-    "outputFormat": "urdf",
-    "packageName": "grasping_bringup/three_finger_gripper_urdf",
-    "robotName": "gripper",
-    "assemblyName": "three_finger_gripper"
-}
